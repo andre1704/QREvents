@@ -63,6 +63,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void showDatabase(View view) {
+        // TODO: 13.08.18
+        // Najpierw stwórz klasę nowej aktywności która będzie odpowiadać za wyświetlanie listy
+        // następnie otwórz aktywność tak samo jak w liniii 51, tylko zmień flagę na nową (REQ_CODE_QR_ACTIVITY zmien na inna własną)
+
+        // Intent intent = new Intent(this, NazwaNowejAktywności.class);
+        //        startActivityForResult(intent, REQ_WLASNA_FLAGA);
+
+        //to co podspodem przenies do tej nowej aktywnosci
+
+
         DBHandler db = new DBHandler(this);
         ArrayList<String> ticketsList = new ArrayList<>();
         List<QRCode> listQR = db.getAllQRCodes();
