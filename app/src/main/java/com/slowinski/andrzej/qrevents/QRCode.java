@@ -13,6 +13,10 @@ public class QRCode {
         this.statusCheck = status;
     }
 
+    public QRCode(String code, int status){
+        this.code = code;
+        this.statusCheck = status;
+    }
 
     public int getId() {
         return id;

@@ -27,7 +27,7 @@ public class DBHandler extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         String CREATE_CONTACTS_TABLE = "CREATE TABLE " + TABLE_QRCODES + "("
-                + KEY_ID + " INTEGER PRIMARY KEY," + KEY_CODE + " TEXT,"
+                + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + KEY_CODE + " TEXT,"
                 + KEY_STATUS + " INTEGER" + ")";
         db.execSQL(CREATE_CONTACTS_TABLE);
     }
@@ -40,12 +40,14 @@ public class DBHandler extends SQLiteOpenHelper {
         onCreate(db);
     }
     public void addQRCode(QRCode qrCode){
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(KEY_CODE, qrCode.getCode());
-        values.put(KEY_STATUS,qrCode.getStatusCheck());
-        db.insert(TABLE_QRCODES, null, values);
-        db.close();
+        if (qrCode != null){
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put(KEY_CODE, qrCode.getCode());
+            values.put(KEY_STATUS,qrCode.getStatusCheck());
+            db.insert(TABLE_QRCODES, null, values);
+            db.close();
+        }
     }
     public QRCode getQRCode(int id){
         SQLiteDatabase db = this.getReadableDatabase();
@@ -54,11 +56,11 @@ public class DBHandler extends SQLiteOpenHelper {
                 new String[]{String.valueOf(id)}, null, null, null,null);
         if (cursor != null){
             cursor.moveToFirst();
-            QRCode ticket = new QRCode((Integer.parseInt(cursor.getString(0)),
+            QRCode ticket = new QRCode(Integer.parseInt(cursor.getString(0)),
                     cursor.getString(1), Integer.parseInt(cursor.getString(2)));
             return ticket;
-
         }
+        return null;
     }
 
     public List<QRCode> getAllQRCodes() {
@@ -97,6 +99,11 @@ public class DBHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_QRCODES, KEY_ID + " = ?",
                 new String[] { String.valueOf(ticket.getId()) });
+        db.close();
+    }
+    public void deleteAllQRCode() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_QRCODES,null,null);
         db.close();
     }
 }
