@@ -1,38 +1,44 @@
 package com.slowinski.andrzej.qrevents;
 
+import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 
-import com.google.zxing.Result;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import me.dm7.barcodescanner.zxing.ZXingScannerView;
+public class MainActivity extends AppCompatActivity {
 
+    public static final int REQ_CODE_QR_ACTIVITY = 234;
 
-public class MainActivity extends AppCompatActivity implements ZXingScannerView.ResultHandler {
-    private ZXingScannerView mScannerView;
-    private static String code;
-    private ListView list ;
-    private ArrayAdapter<String> adapter ;
+    private String code;
+    private ListView list;
+    private ArrayAdapter<String> adapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         DBHandler db = new DBHandler(this);
         db.deleteAllQRCode();
+    }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQ_CODE_QR_ACTIVITY) {
+            if (resultCode == Activity.RESULT_OK) {
+                String resultFormat = data.getStringExtra(QrCodeActivity.BUNDLE_QR_RESULT_FORMAT);
+                String resultText = data.getStringExtra(QrCodeActivity.BUNDLE_QR_RESULT_TEXT);
+
+                onResultsHandled(resultFormat, resultText);
+            }
+        }
     }
 
     @Override
@@ -40,15 +46,12 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
         super.onRestoreInstanceState(savedInstanceState);
     }
 
-
-
-    public void qrScanner(View view){
-        mScannerView = new ZXingScannerView(this);   // Programmatically initialize the scanner view<br />
-        setContentView(mScannerView);
-        mScannerView.setResultHandler(this); // Register ourselves as a handler for scan results.<br />
-        mScannerView.startCamera();         // Start camera<br />
+    public void qrScanner(View view) {
+        Intent intent = new Intent(this, QrCodeActivity.class);
+        startActivityForResult(intent, REQ_CODE_QR_ACTIVITY);
     }
-    public void addToDatabase(View view){
+
+    public void addToDatabase(View view) {
         DBHandler db = new DBHandler(this);
         qrScanner(view);
         db.addQRCode(new QRCode(code, 0));
@@ -58,47 +61,35 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
         AlertDialog alert1 = builder.create();
         alert1.show();
     }
-    public void showDatabase(View view){
+
+    public void showDatabase(View view) {
         DBHandler db = new DBHandler(this);
-        ArrayList<String> ticketsList = new ArrayList<String>();
+        ArrayList<String> ticketsList = new ArrayList<>();
         List<QRCode> listQR = db.getAllQRCodes();
-        for (QRCode item:listQR) {
-            ticketsList.add(item.getCode().toString());
+        for (QRCode item : listQR) {
+            ticketsList.add(item.getCode());
         }
 
         setContentView(R.layout.qrcode_listview);
-        list = (ListView) findViewById(R.id.listView1);
-        adapter = new ArrayAdapter<String>(this, R.layout.single_row_item, ticketsList);
+        list = findViewById(R.id.listView1);
+        adapter = new ArrayAdapter<>(this, R.layout.single_row_item, ticketsList);
         list.setAdapter(adapter);
-
-
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        setContentView(R.layout.activity_main);
     }
 
     @Override
     public void onPause() {
-            super.onPause();
-            mScannerView.stopCamera();   // Stop camera on pause<br />
+        super.onPause();
     }
-    @Override
-    public void handleResult(Result rawResult) {
-        code = rawResult.getBarcodeFormat().toString();
-        Log.e("handler", rawResult.getText());
-        Log.e("handler", rawResult.getBarcodeFormat().toString());
+
+    public void onResultsHandled(String resultFormat, String resultText) {
+        code = resultFormat;
+        Log.e("handler", resultText);
+        Log.e("handler", resultFormat);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Scan Result");
-        builder.setMessage(rawResult.getText());
+        builder.setMessage(resultText);
         AlertDialog alert1 = builder.create();
         alert1.show();
-        mScannerView.stopCameraPreview();
-        mScannerView.stopCamera();
-        setContentView(R.layout.activity_main);
-
     }
 }
