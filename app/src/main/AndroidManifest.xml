@@ -21,8 +21,11 @@
             </intent-filter>
         </activity>
         <activity
+
             android:name=".QrCodeActivity"
             android:configChanges="locale|keyboardHidden|orientation|screenSize|smallestScreenSize|screenLayout" />
+
+
     </application>
 
 </manifest>

@@ -13,19 +13,29 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="QRScanner"
-        android:onClick="qrScanner"
+        android:onClick="scanQR"
         />
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="AddToDatabase"
-        android:onClick="addToDatabase"
+        android:onClick="databaseAdd"
+
         />
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="ShowDatabase"
+        android:text="ShowDB"
         android:onClick="showDatabase"
+
+        />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Validate"
+        android:onClick="validate"
+
         />
 
 </LinearLayout>
